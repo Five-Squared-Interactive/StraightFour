@@ -1,5 +1,5 @@
-# WebVerse World Engine
-The WebVerse World Engine is a World Browser World Engine implemented in Unity.
+# StraightFour World Engine
+The StraightFour World Engine is a World Browser World Engine implemented in Unity.
 
 ## Description
 
@@ -27,7 +27,7 @@ This is the Unity3D World Engine for WebVerse.
    - Text
 
 ## Getting Started
-The WebVerse World Engine has been developed and tested in Unity 2021.3.26 with the Universal Render Pipeline. It will likely work in other versions of Unity and with other Render Pipelines, however this has not been tested.
+The StraightFour World Engine has been developed and tested in Unity 2021.3.26 with the Universal Render Pipeline. It will likely work in other versions of Unity and with other Render Pipelines, however this has not been tested.
 
 ## Developing
 
@@ -38,14 +38,14 @@ The WebVerse World Engine has been developed and tested in Unity 2021.3.26 with 
 
 1. Clone the repository and navigate to that directory:
    ```
-   git clone https://github.com/Five-Squared-Interactive/WebVerse-WorldEngine.git
-   cd WebVerse-WorldEngine
+   git clone https://github.com/Five-Squared-Interactive/StraightFour.git
+   cd StraightFour
    ```
 
 2. Open the project in Unity.
 
 ### Unit Tests
-The [Unit Test Runner](https://docs.unity3d.com/2021.3/Documentation/Manual/testing-editortestsrunner.html) can be used to run WebVerse's unit tests.
+The [Unit Test Runner](https://docs.unity3d.com/2021.3/Documentation/Manual/testing-editortestsrunner.html) can be used to run StraightFour's unit tests.
 
 ## License
 
