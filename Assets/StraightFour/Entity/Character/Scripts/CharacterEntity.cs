@@ -540,6 +540,37 @@ namespace FiveSQD.StraightFour.Entity
             if (characterObjectPrefab == null)
             {
                 characterGO = Instantiate(StraightFour.ActiveWorld.entityManager.characterControllerPrefab);
+                
+                // Check if the default prefab has a label, if not create one
+                TextMeshProUGUI existingLabel = characterGO.GetComponentInChildren<TextMeshProUGUI>();
+                if (existingLabel == null && StraightFour.ActiveWorld.entityManager.characterControllerLabelPrefab != null)
+                {
+                    GameObject characterLabel = Instantiate(StraightFour.ActiveWorld.entityManager.characterControllerLabelPrefab);
+                    characterLabel.transform.SetParent(characterGO.transform);
+                    characterLabel.transform.localPosition = avatarLabelOffset;
+                    
+                    // Add Billboard component to make the label always face the camera
+                    Billboard billboard = characterLabel.GetComponent<Billboard>();
+                    if (billboard == null)
+                    {
+                        billboard = characterLabel.AddComponent<Billboard>();
+                    }
+                    // Lock X axis for character labels to prevent tilting
+                    billboard.lockXAxis = true;
+                    
+                    characterLabel.SetActive(true);
+                }
+                else if (existingLabel != null)
+                {
+                    // Add Billboard component to existing label
+                    Billboard billboard = existingLabel.GetComponent<Billboard>();
+                    if (billboard == null)
+                    {
+                        billboard = existingLabel.gameObject.AddComponent<Billboard>();
+                    }
+                    // Lock X axis for character labels to prevent tilting
+                    billboard.lockXAxis = true;
+                }
             }
             else
             {
@@ -550,6 +581,16 @@ namespace FiveSQD.StraightFour.Entity
                 characterLabel.transform.localPosition = avatarLabelOffset;
                 //characterLabel.transform.localRotation = Quaternion.identity;
                 //characterLabel.transform.localScale = Vector3.one;
+                
+                // Add Billboard component to make the label always face the camera
+                Billboard billboard = characterLabel.GetComponent<Billboard>();
+                if (billboard == null)
+                {
+                    billboard = characterLabel.AddComponent<Billboard>();
+                }
+                // Lock X axis for character labels to prevent tilting
+                billboard.lockXAxis = true;
+                
                 characterLabel.SetActive(true);
             }
             characterGO.transform.SetParent(transform);

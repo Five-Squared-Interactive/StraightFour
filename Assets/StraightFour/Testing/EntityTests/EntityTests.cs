@@ -2847,4 +2847,78 @@ public class EntityTests
         yield return null;
         Assert.True(ve == null);
     }
+
+    [UnityTest]
+    public IEnumerator EntityTests_CharacterLabelBillboard()
+    {
+        // Initialize Camera.
+        GameObject camGO = new GameObject();
+        Camera camera = camGO.AddComponent<Camera>();
+        camera.transform.position = new Vector3(0, 0, -10);
+        camGO.tag = "MainCamera";
+
+        // Initialize World Engine and Load World.
+        GameObject WEGO = new GameObject();
+        StraightFour we = WEGO.AddComponent<StraightFour>();
+        we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Character/Prefabs/UserAvatar.prefab");
+        we.characterControllerLabelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Character/Prefabs/CharacterPrefabLabel.prefab");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        yield return null;
+        StraightFour.LoadWorld("test");
+
+        // Create a character entity with a label
+        Guid characterID = StraightFour.ActiveWorld.entityManager.LoadCharacterEntity(
+            null, we.characterControllerPrefab, Vector3.zero, Quaternion.identity, 
+            Vector3.zero, Vector3.zero, Quaternion.identity, Vector3.one);
+        
+        yield return null;
+
+        // Get the character entity
+        CharacterEntity character = StraightFour.ActiveWorld.entityManager.GetEntity(characterID) as CharacterEntity;
+        Assert.IsNotNull(character);
+
+        // Find the character label with Billboard component
+        Billboard[] billboards = character.GetComponentsInChildren<Billboard>();
+        Assert.AreEqual(1, billboards.Length, "Character should have exactly one Billboard component for its label");
+
+        Billboard labelBillboard = billboards[0];
+        Assert.IsNotNull(labelBillboard);
+        Assert.IsTrue(labelBillboard.lockXAxis, "Character label billboard should have X axis locked");
+
+        // Test billboard behavior
+        Vector3 initialCameraPosition = camera.transform.position;
+        Vector3 labelPosition = labelBillboard.transform.position;
+
+        // Move camera to different positions and verify label rotation
+        Vector3[] testPositions = {
+            new Vector3(10, 0, 0),  // Right
+            new Vector3(-10, 0, 0), // Left
+            new Vector3(0, 10, 0),  // Above
+            new Vector3(0, 0, 10)   // Behind
+        };
+
+        foreach (Vector3 testPos in testPositions)
+        {
+            camera.transform.position = testPos;
+            yield return null; // Let Update() run
+            
+            // Calculate expected direction (billboard should face camera)
+            Vector3 expectedDirection = (testPos - labelPosition);
+            expectedDirection.y = 0; // X axis is locked, so no Y rotation
+            expectedDirection.Normalize();
+
+            // Get actual forward direction of the billboard
+            Vector3 actualDirection = labelBillboard.transform.forward;
+            actualDirection.y = 0;
+            actualDirection.Normalize();
+
+            // They should be pointing in the same general direction (dot product close to 1)
+            float dot = Vector3.Dot(expectedDirection, actualDirection);
+            Assert.IsTrue(dot > 0.8f, $"Billboard should face camera at position {testPos}. Dot product: {dot}");
+        }
+
+        // Clean up
+        character.Delete();
+        yield return null;
+    }
 }
