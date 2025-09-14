@@ -40,6 +40,11 @@ namespace FiveSQD.StraightFour.Entity
         private List<TerrainEntityLayer> terrainEntityLayers;
 
         /// <summary>
+        /// Whether or not to enable stitching with adjacent terrain entities.
+        /// </summary>
+        private bool enableStitching;
+
+        /// <summary>
         /// Create a terrain entity.
         /// </summary>
         /// <param name="length">Length of the terrain.</param>
@@ -52,6 +57,24 @@ namespace FiveSQD.StraightFour.Entity
         /// <returns>The requested terrain entity.</returns>
         public static TerrainEntity Create(float length, float width, float height,
             float[,] heights, TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks, Guid id)
+         {
+            return Create(length, width, height, heights, layers, layerMasks, id, false);
+        }
+
+        /// <summary>
+        /// Create a terrain entity with optional stitching.
+        /// </summary>
+        /// <param name="length">Length of the terrain.</param>
+        /// <param name="width">Width of the terrain.</param>
+        /// <param name="height">Height of the terrain.</param>
+        /// <param name="heights">2D array of heights for the terrain.</param>
+        /// <param name="layers">Array of layers for the terrain.</param>
+        /// <param name="layerMasks">Dictionary of layer indices and layer masks for the terrain.</param>
+        /// <param name="id">ID for the terrain.</param>
+        /// <param name="enableStitching">Whether to enable stitching with adjacent terrains.</param>
+        /// <returns>The requested terrain entity.</returns>
+        public static TerrainEntity Create(float length, float width, float height,
+            float[,] heights, TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks, Guid id, bool enableStitching)
         {
             GameObject terrainGO = new GameObject("TerrainEntity-" + id.ToString());
             TerrainEntity terrainEntity = terrainGO.AddComponent<TerrainEntity>();
@@ -60,8 +83,16 @@ namespace FiveSQD.StraightFour.Entity
             terrainObject.transform.SetParent(terrainGO.transform);
             terrainEntity.terrain = terrainObject.GetComponent<UnityEngine.Terrain>();
             terrainEntity.terrainCollider = terrainObject.GetComponent<TerrainCollider>();
+            terrainEntity.enableStitching = enableStitching;
             terrainEntity.Initialize(id, layers, layerMasks);
             terrainEntity.SetHeights(length, width, height, heights);
+
+            // Apply stitching if enabled
+            if (enableStitching)
+            {
+                terrainEntity.StitchWithAdjacentTerrains();
+            }
+
             return terrainEntity;
         }
 
@@ -372,6 +403,221 @@ namespace FiveSQD.StraightFour.Entity
             }
 
             return heights[xIndex, yIndex];
+        }
+
+        /// <summary>
+        /// Get or set whether stitching with adjacent terrain entities is enabled.
+        /// </summary>
+        /// <returns>Whether stitching is enabled.</returns>
+        public bool GetStitching()
+        {
+            return enableStitching;
+        }
+
+        /// <summary>
+        /// Set whether stitching with adjacent terrain entities is enabled.
+        /// </summary>
+        /// <param name="enabled">Whether to enable stitching.</param>
+        public void SetStitching(bool enabled)
+        {
+            enableStitching = enabled;
+        }
+
+        /// <summary>
+        /// Find adjacent terrain entities for stitching.
+        /// </summary>
+        /// <param name="maxDistance">Maximum distance to search for adjacent terrains.</param>
+        /// <returns>List of adjacent terrain entities.</returns>
+        public List<TerrainEntity> FindAdjacentTerrains(float maxDistance = 0.1f)
+        {
+            List<TerrainEntity> adjacentTerrains = new List<TerrainEntity>();
+
+            if (terrain?.terrainData == null)
+                return adjacentTerrains;
+
+            // Get all TerrainEntity instances in the scene
+            TerrainEntity[] allTerrains = FindObjectsOfType<TerrainEntity>();
+
+            Vector3 myPosition = GetPosition(false);
+            Vector3 mySize = terrain.terrainData.size;
+            Bounds myBounds = new Bounds(myPosition + mySize * 0.5f, mySize);
+
+            foreach (TerrainEntity otherTerrain in allTerrains)
+            {
+                if (otherTerrain == this || otherTerrain.terrain?.terrainData == null)
+                    continue;
+
+                Vector3 otherPosition = otherTerrain.GetPosition(false);
+                Vector3 otherSize = otherTerrain.terrain.terrainData.size;
+                Bounds otherBounds = new Bounds(otherPosition + otherSize * 0.5f, otherSize);
+
+                // Check if terrains are adjacent (within maxDistance)
+                float distance = Vector3.Distance(myBounds.center, otherBounds.center);
+                float expectedDistance = (mySize.x + otherSize.x) * 0.5f; // Distance for X-axis adjacency
+                float expectedDistanceZ = (mySize.z + otherSize.z) * 0.5f; // Distance for Z-axis adjacency
+
+                if (Mathf.Abs(distance - expectedDistance) <= maxDistance || 
+                    Mathf.Abs(distance - expectedDistanceZ) <= maxDistance)
+                {
+                    adjacentTerrains.Add(otherTerrain);
+                }
+            }
+
+            return adjacentTerrains;
+        }
+
+        /// <summary>
+        /// Stitch edges with adjacent terrain entities.
+        /// </summary>
+        public void StitchWithAdjacentTerrains()
+        {
+            if (!enableStitching || terrain?.terrainData == null || heights == null)
+                return;
+
+            List<TerrainEntity> adjacentTerrains = FindAdjacentTerrains();
+
+            foreach (TerrainEntity adjacentTerrain in adjacentTerrains)
+            {
+                StitchWithTerrain(adjacentTerrain);
+            }
+        }
+
+        /// <summary>
+        /// Stitch edges with a specific terrain entity.
+        /// </summary>
+        /// <param name="otherTerrain">The terrain to stitch with.</param>
+        private void StitchWithTerrain(TerrainEntity otherTerrain)
+        {
+            if (otherTerrain?.terrain?.terrainData == null || otherTerrain.heights == null)
+                return;
+
+            Vector3 myPosition = GetPosition(false);
+            Vector3 otherPosition = otherTerrain.GetPosition(false);
+            Vector3 mySize = terrain.terrainData.size;
+            Vector3 otherSize = otherTerrain.terrain.terrainData.size;
+
+            // Determine relative position (which edge to stitch)
+            Vector3 positionDiff = otherPosition - myPosition;
+
+            // Create a copy of heights for modification
+            float[,] modifiedHeights = (float[,])heights.Clone();
+
+            // Stitch based on relative position
+            if (Mathf.Abs(positionDiff.x) > Mathf.Abs(positionDiff.z))
+            {
+                // Terrains are adjacent on X axis
+                if (positionDiff.x > 0)
+                {
+                    // Other terrain is to the right, stitch right edge
+                    StitchRightEdge(modifiedHeights, otherTerrain.heights);
+                }
+                else
+                {
+                    // Other terrain is to the left, stitch left edge
+                    StitchLeftEdge(modifiedHeights, otherTerrain.heights);
+                }
+            }
+            else
+            {
+                // Terrains are adjacent on Z axis
+                if (positionDiff.z > 0)
+                {
+                    // Other terrain is in front, stitch front edge
+                    StitchFrontEdge(modifiedHeights, otherTerrain.heights);
+                }
+                else
+                {
+                    // Other terrain is behind, stitch back edge
+                    StitchBackEdge(modifiedHeights, otherTerrain.heights);
+                }
+            }
+
+            // Apply the modified heights
+            ApplyStitchedHeights(modifiedHeights);
+        }
+
+        /// <summary>
+        /// Stitch the right edge with another terrain's left edge.
+        /// </summary>
+        private void StitchRightEdge(float[,] heights, float[,] otherHeights)
+        {
+            int myWidth = heights.GetLength(0);
+            int myHeight = heights.GetLength(1);
+            int otherHeight = otherHeights.GetLength(1);
+
+            // Match the right edge of this terrain with the left edge of the other terrain
+            for (int j = 0; j < Mathf.Min(myHeight, otherHeight); j++)
+            {
+                int otherJ = myHeight > 1 ? j * (otherHeight - 1) / (myHeight - 1) : 0;
+                float averageHeight = (heights[myWidth - 1, j] + otherHeights[0, otherJ]) * 0.5f;
+                heights[myWidth - 1, j] = averageHeight;
+            }
+        }
+
+        /// <summary>
+        /// Stitch the left edge with another terrain's right edge.
+        /// </summary>
+        private void StitchLeftEdge(float[,] heights, float[,] otherHeights)
+        {
+            int myHeight = heights.GetLength(1);
+            int otherWidth = otherHeights.GetLength(0);
+            int otherHeight = otherHeights.GetLength(1);
+
+            // Match the left edge of this terrain with the right edge of the other terrain
+            for (int j = 0; j < Mathf.Min(myHeight, otherHeight); j++)
+            {
+                int otherJ = myHeight > 1 ? j * (otherHeight - 1) / (myHeight - 1) : 0;
+                float averageHeight = (heights[0, j] + otherHeights[otherWidth - 1, otherJ]) * 0.5f;
+                heights[0, j] = averageHeight;
+            }
+        }
+
+        /// <summary>
+        /// Stitch the front edge with another terrain's back edge.
+        /// </summary>
+        private void StitchFrontEdge(float[,] heights, float[,] otherHeights)
+        {
+            int myWidth = heights.GetLength(0);
+            int myHeight = heights.GetLength(1);
+            int otherWidth = otherHeights.GetLength(0);
+
+            // Match the front edge of this terrain with the back edge of the other terrain
+            for (int i = 0; i < Mathf.Min(myWidth, otherWidth); i++)
+            {
+                int otherI = myWidth > 1 ? i * (otherWidth - 1) / (myWidth - 1) : 0;
+                float averageHeight = (heights[i, myHeight - 1] + otherHeights[otherI, 0]) * 0.5f;
+                heights[i, myHeight - 1] = averageHeight;
+            }
+        }
+
+        /// <summary>
+        /// Stitch the back edge with another terrain's front edge.
+        /// </summary>
+        private void StitchBackEdge(float[,] heights, float[,] otherHeights)
+        {
+            int myWidth = heights.GetLength(0);
+            int otherWidth = otherHeights.GetLength(0);
+            int otherHeight = otherHeights.GetLength(1);
+
+            // Match the back edge of this terrain with the front edge of the other terrain
+            for (int i = 0; i < Mathf.Min(myWidth, otherWidth); i++)
+            {
+                int otherI = myWidth > 1 ? i * (otherWidth - 1) / (myWidth - 1) : 0;
+                float averageHeight = (heights[i, 0] + otherHeights[otherI, otherHeight - 1]) * 0.5f;
+                heights[i, 0] = averageHeight;
+            }
+        }
+
+        /// <summary>
+        /// Apply stitched heights to the terrain.
+        /// </summary>
+        private void ApplyStitchedHeights(float[,] modifiedHeights)
+        {
+            heights = modifiedHeights;
+
+            // Apply to Unity terrain
+            Vector3 terrainSize = terrain.terrainData.size;
+            SetHeights(terrainSize.x, terrainSize.z, terrainSize.y, modifiedHeights);
         }
 
         /// <summary>
