@@ -429,7 +429,7 @@ Synchronization system uses observer pattern:
 ## Integration Points
 
 ### Unity Integration
-- Built on Unity 2021.3.26 with URP
+- Built on Unity 6000.0.35f1 with URP
 - Leverages Unity's physics, rendering, and input systems
 - Compatible with Unity's XR framework for VR/AR
 
