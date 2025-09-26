@@ -9,6 +9,16 @@ using System.Collections;
 
 public class WorldTests
 {
+    [TearDown]
+    public void TearDown()
+    {
+        // Clean up any loaded world after each test
+        if (StraightFour.ActiveWorld != null)
+        {
+            StraightFour.UnloadWorld();
+        }
+    }
+
     [UnityTest]
     public IEnumerator WorldTests_World()
     {
@@ -25,7 +35,7 @@ public class WorldTests
             maxEntryLength = 128,
             maxKeyLength = 16,
             maxStorageEntries = 16,
-            skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat"),
+            skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat"),
             liteProceduralSkyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/LiteProceduralSkybox.mat"),
             defaultCloudTexture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/StraightFour/Environment/Textures/DefaultClouds.png"),
             defaultStarTexture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/StraightFour/Environment/Textures/DefaultStars.png"),

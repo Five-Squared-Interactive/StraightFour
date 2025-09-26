@@ -13,6 +13,16 @@ using FiveSQD.StraightFour.Entity.Terrain;
 
 public class EntityManagerTests
 {
+    [TearDown]
+    public void TearDown()
+    {
+        // Clean up any loaded world after each test
+        if (StraightFour.ActiveWorld != null)
+        {
+            StraightFour.UnloadWorld();
+        }
+    }
+
     [UnityTest]
     public IEnumerator EntityManagerTests_General()
     {
@@ -24,7 +34,7 @@ public class EntityManagerTests
         we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Character/Prefabs/UserAvatar.prefab");
         we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Voxel/Prefabs/Voxel.prefab");
         we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 

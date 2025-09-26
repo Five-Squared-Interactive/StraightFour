@@ -10,6 +10,16 @@ using UnityEditor;
 
 public class SynchronizationTests
 {
+    [TearDown]
+    public void TearDown()
+    {
+        // Clean up any loaded world after each test
+        if (StraightFour.ActiveWorld != null)
+        {
+            StraightFour.UnloadWorld();
+        }
+    }
+
     [UnityTest]
     public IEnumerator SynchronizationTests_General()
     {
@@ -22,7 +32,7 @@ public class SynchronizationTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -64,5 +74,27 @@ public class SynchronizationTests
 
         // Make Screen Canvas.
         Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.MakeScreenCanvas(null));
+
+        // Set Position Percent.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetPositionPercent(null, Vector2.zero));
+
+        // Set Size Percent.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetSizePercent(null, Vector2.zero));
+
+        // Modify Terrain Entity.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.ModifyTerrainEntity(null, 0, 0, 0, null));
+
+        // Set Interaction State.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetInteractionState(null, BaseEntity.InteractionState.Static));
+
+        // Add Synchronized Entity.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.AddSynchronizedEntity(null, false));
+
+        // Remove Synchronized Entity.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.RemoveSynchronizedEntity(null));
+
+        // Send Message.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SendMessage(null, null));
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SendMessage("topic", "message"));
     }
 }

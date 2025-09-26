@@ -14,13 +14,23 @@ using System.Collections.Generic;
 
 public class EntityTests
 {
+    [TearDown]
+    public void TearDown()
+    {
+        // Clean up any loaded world after each test
+        if (StraightFour.ActiveWorld != null)
+        {
+            StraightFour.UnloadWorld();
+        }
+    }
+
     [UnityTest]
     public IEnumerator EntityTests_BaseEntity()
     {
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -200,7 +210,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -380,7 +390,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -571,7 +581,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -761,7 +771,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -933,7 +943,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject("WEGO");
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -1151,7 +1161,7 @@ public class EntityTests
         StraightFour we = WEGO.AddComponent<StraightFour>();
         yield return null;
         we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         StraightFour.LoadWorld("test");
 
         // Set up Entity.
@@ -1362,7 +1372,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject("WEGO");
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -1589,7 +1599,7 @@ public class EntityTests
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
         we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Character/Prefabs/UserAvatar.prefab");
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -1771,7 +1781,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -1983,7 +1993,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -2165,7 +2175,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -2413,7 +2423,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -2657,7 +2667,7 @@ public class EntityTests
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
         we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Voxel/Prefabs/Voxel.prefab");
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
@@ -2862,7 +2872,7 @@ public class EntityTests
         StraightFour we = WEGO.AddComponent<StraightFour>();
         we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Character/Prefabs/UserAvatar.prefab");
         we.characterControllerLabelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/StraightFour/Entity/Character/Prefabs/CharacterPrefabLabel.prefab");
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 
