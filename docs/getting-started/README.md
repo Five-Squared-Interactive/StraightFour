@@ -6,7 +6,7 @@ This guide will help you quickly set up and start using the WebVerse World Engin
 
 Before you begin, ensure you have:
 
-- **Unity 2021.3.26 or later** with Universal Render Pipeline (URP)
+- **Unity 6000.0.35f1 or later** with Universal Render Pipeline (URP)
 - **Git** for version control
 - **Basic Unity knowledge** - Understanding of GameObjects, Components, and Scenes
 - **C# programming experience** for custom functionality
