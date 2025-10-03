@@ -230,6 +230,58 @@ WorldInfo worldInfo = new WorldInfo
 bool success = StraightFour.LoadWorld("MyWorld", worldInfo);
 ```
 
+### World Offset Auto-Update
+
+The World class supports automatic world offset updates to maintain floating-point precision as characters move far from the Unity origin. This feature helps prevent precision-related issues and ensures smooth gameplay regardless of how far entities travel in the world.
+
+#### Configuration
+
+```csharp
+// Enable automatic world offset updates
+StraightFour.ActiveWorld.enableAutoWorldOffsetUpdate = true;
+
+// Set the distance threshold (in Unity units) that triggers an offset update
+StraightFour.ActiveWorld.worldOffsetUpdateThreshold = 1000f;
+
+// Register a character entity to track
+CharacterEntity playerCharacter = // ... your player character
+StraightFour.ActiveWorld.SetTrackedCharacterEntity(playerCharacter);
+```
+
+#### How It Works
+
+1. **Distance Monitoring**: The World's Update() method continuously monitors the tracked character's Unity position (transform.position)
+2. **Threshold Check**: When the character's distance from the Unity origin (0, 0, 0) exceeds the threshold, an update is triggered
+3. **Offset Update**: The world offset is adjusted to recenter the Unity coordinate system at the character's location
+4. **Position Preservation**: All entities' logical (world) positions are preserved while their Unity positions are shifted to stay near the origin
+
+**Example:**
+- Character moves to Unity position (1500, 0, 0) with current offset (0, 0, 0)
+- Distance 1500 exceeds threshold of 1000, triggering an update
+- New offset is set to (-1500, 0, 0)
+- Character's Unity position becomes (0, 0, 0) while maintaining logical position (1500, 0, 0)
+
+#### Benefits
+
+- **Improved Precision**: Keeps Unity transform positions close to origin, avoiding floating-point precision loss
+- **Seamless Experience**: Characters can travel unlimited distances without precision degradation
+- **Automatic**: No manual intervention needed once configured
+- **Configurable**: Threshold can be adjusted based on world scale and precision requirements
+
+#### Default Values
+
+```csharp
+public float worldOffsetUpdateThreshold = 1000f;  // Unity units
+public bool enableAutoWorldOffsetUpdate = true;   // Enabled by default
+```
+
+#### Notes
+
+- Only horizontal (X, Z) axes are recentered; Y-axis offset remains unchanged
+- The feature can be disabled by setting `enableAutoWorldOffsetUpdate = false`
+- The tracked character entity can be changed at runtime using `SetTrackedCharacterEntity()`
+- If no character is tracked, automatic updates will not occur
+
 ## Unity Project Configuration
 
 ### Package Dependencies
