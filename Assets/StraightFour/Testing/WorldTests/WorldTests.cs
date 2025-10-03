@@ -55,4 +55,69 @@ public class WorldTests
         Assert.IsTrue(world.cameraManager == null);
         Assert.IsTrue(world.materialManager == null);
     }
+
+    [UnityTest]
+    public IEnumerator WorldTests_WorldOffsetUpdate()
+    {
+        // Initialize World Engine and Load World.
+        GameObject WEGO = new GameObject();
+        StraightFour we = WEGO.AddComponent<StraightFour>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
+        we.liteProceduralSkyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/LiteProceduralSkybox.mat");
+        yield return null;
+        StraightFour.LoadWorld("test");
+
+        // Create a character entity
+        GameObject characterGO = new GameObject("TestCharacter");
+        CharacterEntity character = characterGO.AddComponent<CharacterEntity>();
+        character.Initialize(System.Guid.NewGuid(), null, Vector3.zero, Quaternion.identity, Vector3.zero);
+        character.SetInteractionState(FiveSQD.StraightFour.Entity.BaseEntity.InteractionState.Physical);
+
+        // Set the tracked character
+        StraightFour.ActiveWorld.SetTrackedCharacterEntity(character);
+        StraightFour.ActiveWorld.enableAutoWorldOffsetUpdate = true;
+        StraightFour.ActiveWorld.worldOffsetUpdateThreshold = 100f;
+
+        // Verify initial offset is zero
+        Assert.AreEqual(Vector3.zero, StraightFour.ActiveWorld.worldOffset);
+
+        // Move character beyond threshold
+        character.SetPosition(new Vector3(150, 0, 0), false, false);
+        
+        // Wait a frame for Update to run
+        yield return null;
+
+        // Verify world offset was updated
+        Vector3 expectedOffset = new Vector3(150, 0, 0);
+        Assert.AreEqual(expectedOffset, StraightFour.ActiveWorld.worldOffset);
+
+        // Move character closer to new origin (within threshold)
+        character.SetPosition(new Vector3(160, 0, 10), false, false);
+        
+        // Wait a frame for Update to run
+        yield return null;
+
+        // Offset should remain the same since distance from origin is still within threshold
+        Assert.AreEqual(expectedOffset, StraightFour.ActiveWorld.worldOffset);
+
+        // Move character far again
+        character.SetPosition(new Vector3(300, 0, 0), false, false);
+        
+        // Wait a frame for Update to run
+        yield return null;
+
+        // Verify offset updated again
+        expectedOffset = new Vector3(300, 0, 0);
+        Assert.AreEqual(expectedOffset, StraightFour.ActiveWorld.worldOffset);
+
+        // Test disabling auto-update
+        StraightFour.ActiveWorld.enableAutoWorldOffsetUpdate = false;
+        character.SetPosition(new Vector3(500, 0, 0), false, false);
+        
+        // Wait a frame for Update to run
+        yield return null;
+
+        // Offset should NOT have changed
+        Assert.AreEqual(new Vector3(300, 0, 0), StraightFour.ActiveWorld.worldOffset);
+    }
 }

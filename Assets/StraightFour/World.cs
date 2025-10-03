@@ -224,6 +224,23 @@ namespace FiveSQD.StraightFour.World
         private Vector3 _worldOffset;
 
         /// <summary>
+        /// The character entity being tracked for world offset updates.
+        /// </summary>
+        private CharacterEntity trackedCharacterEntity;
+
+        /// <summary>
+        /// The distance threshold from origin that triggers a world offset update.
+        /// </summary>
+        [Tooltip("The distance threshold from origin that triggers a world offset update.")]
+        public float worldOffsetUpdateThreshold = 1000f;
+
+        /// <summary>
+        /// Whether or not to enable automatic world offset updates.
+        /// </summary>
+        [Tooltip("Whether or not to enable automatic world offset updates.")]
+        public bool enableAutoWorldOffsetUpdate = true;
+
+        /// <summary>
         /// The GameObject for the mesh manager.
         /// </summary>
         private GameObject meshManagerGO;
@@ -369,6 +386,43 @@ namespace FiveSQD.StraightFour.World
 #endif
 
             siteName = worldInfo.siteName;
+        }
+
+        /// <summary>
+        /// Set the character entity to track for automatic world offset updates.
+        /// </summary>
+        /// <param name="entity">The character entity to track.</param>
+        public void SetTrackedCharacterEntity(CharacterEntity entity)
+        {
+            trackedCharacterEntity = entity;
+        }
+
+        /// <summary>
+        /// Update method to check tracked character distance and update world offset if needed.
+        /// </summary>
+        void Update()
+        {
+            if (!enableAutoWorldOffsetUpdate || trackedCharacterEntity == null)
+            {
+                return;
+            }
+
+            // Get the current position of the tracked character entity (world-space, not local)
+            Vector3 characterPosition = trackedCharacterEntity.GetPosition(false);
+
+            // Calculate distance from origin
+            float distanceFromOrigin = characterPosition.magnitude;
+
+            // If beyond threshold, update world offset to recenter around character
+            if (distanceFromOrigin > worldOffsetUpdateThreshold)
+            {
+                // Calculate new offset to recenter the world around the character
+                // We want to move the world offset to the character's position
+                Vector3 newOffset = new Vector3(characterPosition.x, worldOffset.y, characterPosition.z);
+                
+                // Update the world offset
+                worldOffset = newOffset;
+            }
         }
 
         /// <summary>
