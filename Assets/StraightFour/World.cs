@@ -407,18 +407,23 @@ namespace FiveSQD.StraightFour.World
                 return;
             }
 
-            // Get the current position of the tracked character entity (world-space, not local)
-            Vector3 characterPosition = trackedCharacterEntity.GetPosition(false);
+            // Get the Unity position of the tracked character entity
+            Vector3 unityPosition = trackedCharacterEntity.transform.position;
 
-            // Calculate distance from origin
-            float distanceFromOrigin = characterPosition.magnitude;
+            // Calculate distance from Unity origin (0, 0, 0)
+            float distanceFromOrigin = unityPosition.magnitude;
 
             // If beyond threshold, update world offset to recenter around character
             if (distanceFromOrigin > worldOffsetUpdateThreshold)
             {
-                // Calculate new offset to recenter the world around the character
-                // We want to move the world offset to the character's position
-                Vector3 newOffset = new Vector3(characterPosition.x, worldOffset.y, characterPosition.z);
+                // Calculate new offset to recenter the Unity origin at the character
+                // We want Unity position to be (0, 0, 0) while preserving logical position
+                // Unity = Logical + offset
+                // Target: Unity' = (0, 0, 0), Logical' = Logical (preserved by setter)
+                // We have: Logical = Unity - offset
+                // So: Unity' = Logical + offset' = (Unity - offset) + offset' = (0, 0, 0)
+                // Therefore: offset' = offset - Unity
+                Vector3 newOffset = new Vector3(worldOffset.x - unityPosition.x, worldOffset.y, worldOffset.z - unityPosition.z);
                 
                 // Update the world offset
                 worldOffset = newOffset;
