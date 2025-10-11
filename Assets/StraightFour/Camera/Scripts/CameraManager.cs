@@ -393,6 +393,7 @@ namespace FiveSQD.StraightFour.Camera
             
             if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit))
             {
+                hit.point -= StraightFour.ActiveWorld.worldOffset;
                 return hit;
             }
             return null;
@@ -407,6 +408,7 @@ namespace FiveSQD.StraightFour.Camera
             {
                 Transform objectHit = hit.transform;
 
+                hit.point -= StraightFour.ActiveWorld.worldOffset;
                 return hit;
             }
 

@@ -1811,23 +1811,24 @@ namespace FiveSQD.StraightFour.Entity
 #if USE_DIGGER
         private void Update()
         {
-            List<ModificationParameters> parametersList = new List<ModificationParameters>();
+            /*List<ModificationParameters> parametersList = new List<ModificationParameters>();
             if (!modifying)
             {
                 while (modBuf.Count > 0 && parametersList.Count < modBatchSize)
                 {
+                    LogSystem.Log("modbuf");
                     parametersList.Add(modBuf.Dequeue());
                 }
                 if (parametersList.Count > 0)
                 {
                     StartCoroutine(ModifyBatchAsync(parametersList.ToArray()));
                 }
-            }
-            /*if (!modifying && modBuf.Count > 0)
+            }*/
+            if (!modifying && modBuf.Count > 0)
             {
                 var parameters = modBuf.Dequeue();
                 StartCoroutine(ModifyAsync(parameters));
-            }*/
+            }
         }
 #endif
     }
