@@ -12,7 +12,7 @@ jobs:
         projectPath:
           - .
         unityVersion:
-          - 2022.3.19f1
+          - 6000.0.35f1
         testMode:
           - playmode
     steps:
@@ -32,16 +32,14 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
-          unityVersion: 2022.3.19f1
-      - uses: actions/upload-artifact@v2
+          unityVersion: 6000.0.35f1
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}

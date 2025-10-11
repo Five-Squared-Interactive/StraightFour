@@ -9,6 +9,16 @@ using UnityEditor;
 
 public class CameraTests
 {
+    [TearDown]
+    public void TearDown()
+    {
+        // Clean up any loaded world after each test
+        if (StraightFour.ActiveWorld != null)
+        {
+            StraightFour.UnloadWorld();
+        }
+    }
+
     [UnityTest]
     public IEnumerator CameraTests_General()
     {
@@ -21,7 +31,7 @@ public class CameraTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         StraightFour we = WEGO.AddComponent<StraightFour>();
-        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/Skybox.mat");
         yield return null;
         StraightFour.LoadWorld("test");
 

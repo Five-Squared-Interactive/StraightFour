@@ -27,13 +27,13 @@ This is the Unity3D World Engine for WebVerse.
    - Text
 
 ## Getting Started
-The StraightFour World Engine has been developed and tested in Unity 2021.3.26 with the Universal Render Pipeline. It will likely work in other versions of Unity and with other Render Pipelines, however this has not been tested.
+The StraightFour World Engine has been developed and tested in Unity 6000.0.35f1 with the Universal Render Pipeline. It will likely work in other versions of Unity and with other Render Pipelines, however this has not been tested.
 
 ## Developing
 
 ### Development Prerequisites
 
-* Unity 2021.3.26 with Universal Render Pipeline
+* Unity 6000.0.35f1 with Universal Render Pipeline
 ### Setup
 
 1. Clone the repository and navigate to that directory:
