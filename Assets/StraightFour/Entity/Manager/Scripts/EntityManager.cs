@@ -781,7 +781,15 @@ namespace FiveSQD.StraightFour.Entity
             GameObject meshGO = Instantiate(meshPrefab);
             meshGO.name = "MeshEntity-" + id.ToString();
             MeshEntity entity = meshGO.AddComponent<MeshEntity>();
-            entities.Add(id, entity);
+            if (entities.ContainsKey(id))
+            {
+                LogSystem.LogWarning("[EntityManager->LoadMeshEntity] Entity with ID " + id.ToString() + " already exists. Overwriting.");
+                entities[id] = entity;
+            }
+            else
+            {
+                entities.Add(id, entity);
+            }
             entity.SetParent(parent);
             entity.entityTag = tag;
             entity.SetPosition(position, true);

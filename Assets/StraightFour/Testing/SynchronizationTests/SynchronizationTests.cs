@@ -82,10 +82,10 @@ public class SynchronizationTests
         Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetSizePercent(null, Vector2.zero));
 
         // Modify Terrain Entity.
-        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.ModifyTerrainEntity(null, 0, 0, 0, null));
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.ModifyTerrainEntity(null, 0, Vector3.zero, 0, 0));
 
         // Set Interaction State.
-        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetInteractionState(null, BaseEntity.InteractionState.Static));
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetInteractionState(null, FiveSQD.StraightFour.Entity.BaseEntity.InteractionState.Static));
 
         // Add Synchronized Entity.
         Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.AddSynchronizedEntity(null, false));
