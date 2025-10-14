@@ -15,12 +15,41 @@ namespace FiveSQD.StraightFour.Utilities
         public enum Type { Default, Debug, Warning, Error };
 
         /// <summary>
+        /// Current logging configuration. If null, all logging is enabled.
+        /// </summary>
+        private static LoggingConfig loggingConfig;
+
+        /// <summary>
+        /// Set the logging configuration.
+        /// </summary>
+        /// <param name="config">The logging configuration to use. If null, all logging is enabled.</param>
+        public static void SetLoggingConfig(LoggingConfig config)
+        {
+            loggingConfig = config;
+        }
+
+        /// <summary>
+        /// Get the current logging configuration.
+        /// </summary>
+        /// <returns>The current logging configuration, or null if not set.</returns>
+        public static LoggingConfig GetLoggingConfig()
+        {
+            return loggingConfig;
+        }
+
+        /// <summary>
         /// Log a message.
         /// </summary>
         /// <param name="message">Message to log.</param>
         /// <param name="type">Type of the message.</param>
         public static void Log(string message, Type type = Type.Default)
         {
+            // Check if this log type should be filtered out
+            if (loggingConfig != null && !loggingConfig.ShouldLog(type))
+            {
+                return;
+            }
+
             // Forward to Unity's Logging System.
             switch (type)
             {

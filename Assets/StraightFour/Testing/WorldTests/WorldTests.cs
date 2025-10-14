@@ -13,9 +13,9 @@ public class WorldTests
     public void TearDown()
     {
         // Clean up any loaded world after each test
-        if (StraightFour.ActiveWorld != null)
+        if (FiveSQD.StraightFour.StraightFour.ActiveWorld != null)
         {
-            StraightFour.UnloadWorld();
+            FiveSQD.StraightFour.StraightFour.UnloadWorld();
         }
     }
 

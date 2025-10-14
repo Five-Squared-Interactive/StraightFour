@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace FiveSQD.StraightFour
@@ -125,6 +126,12 @@ namespace FiveSQD.StraightFour
         /// Crosshair.
         /// </summary>
         public GameObject crosshair;
+        
+        /// <summary>
+        /// Logging configuration for the StraightFour instance.
+        /// </summary>
+        [Tooltip("Logging configuration for the StraightFour instance.")]
+        public Utilities.LoggingConfig loggingConfig;
 
         /// <summary>
         /// The active world loaded by the world engine.
@@ -137,7 +144,7 @@ namespace FiveSQD.StraightFour
                 {
                     return null;
                 }
-                
+
                 return instance.currentWorld;
             }
         }
@@ -166,9 +173,15 @@ namespace FiveSQD.StraightFour
         /// Load a world.
         /// </summary>
         /// <param name="worldName">Name for the world.</param>
+        /// <param name="queryParams">Query parameters for the world.</param>
+        /// <param name="loggingConfig">Logging configuration to use. If null, uses the instance's default configuration.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public static bool LoadWorld(string worldName, string queryParams = null)
+        public static bool LoadWorld(string worldName, string queryParams = null, Utilities.LoggingConfig loggingConfig = null)
         {
+            // Set the logging configuration if provided, otherwise use the instance's default
+            Utilities.LoggingConfig configToUse = loggingConfig ?? instance.loggingConfig;
+            Utilities.LogSystem.SetLoggingConfig(configToUse);
+
             if (instance.currentWorld != null)
             {
                 Utilities.LogSystem.LogError("[StraightFour->LoadWorld] Cannot load world. A world is loaded.");
@@ -238,6 +251,8 @@ namespace FiveSQD.StraightFour
             }
 
             Utilities.LogSystem.Log("[StraightFour->UnloadWorld] World Object Destroyed.");
+
+            System.GC.Collect();
         }
 
         /// <summary>
@@ -267,7 +282,10 @@ namespace FiveSQD.StraightFour
                 return;
             }
 
-            string[] kvps = rawParams.Replace("%26", "&").Split("&");
+            string pattern = @"&(?!quot;)";
+
+            Regex reg = new Regex(pattern);
+            string[] kvps = reg.Split(rawParams.Replace("%26", "&"));
             foreach (string kvp in kvps)
             {
                 string[] param = kvp.Split("=");

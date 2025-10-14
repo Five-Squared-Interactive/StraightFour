@@ -222,12 +222,12 @@ namespace FiveSQD.StraightFour.Entity
         /// <returns>The ID of the new terrain entity.</returns>
         public Guid LoadTerrainEntity(float length, float width, float height,
             float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
-            BaseEntity parentEntity, Vector3 position, Quaternion rotation, Guid? id = null,
+            BaseEntity parentEntity, Vector3 position, Quaternion rotation, bool stitchTerrain, Guid? id = null,
             string tag = null, Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadTerrainEntity(length, width, height, heights, layers, layerMasks,
-                entityID, parentEntity, position, rotation, tag, onLoaded));
+                entityID, parentEntity, position, rotation, stitchTerrain, tag, onLoaded));
             return entityID;
         }
 
@@ -249,7 +249,7 @@ namespace FiveSQD.StraightFour.Entity
         /// <returns>The ID of the new terrain entity.</returns>
         public Guid LoadTerrainEntity(float length, float width, float height,
             float[][] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
-            BaseEntity parentEntity, Vector3 position, Quaternion rotation, Guid? id = null,
+            BaseEntity parentEntity, Vector3 position, Quaternion rotation, bool stitchTerrain, Guid? id = null,
             string tag = null, Action onLoaded = null)
         {
             if (heights == null || heights[0] == null)
@@ -268,7 +268,7 @@ namespace FiveSQD.StraightFour.Entity
             }
 
             return LoadTerrainEntity(length, width, height, processedHeights, layers, layerMasks,
-                parentEntity, position, rotation, id, tag, onLoaded);
+                parentEntity, position, rotation, stitchTerrain, id, tag, onLoaded);
         }
 
         /// <summary>
@@ -289,12 +289,12 @@ namespace FiveSQD.StraightFour.Entity
         /// <returns>The ID of the new terrain entity.</returns>
         public Guid LoadHybridTerrainEntity(float length, float width, float height,
             float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
-            BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            BaseEntity parentEntity, Vector3 position, Quaternion rotation, bool stitchTerrains,
             Guid? id = null, string tag = null, Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadHybridTerrainEntity(length, width, height, heights, layers,
-                layerMasks, entityID, parentEntity, position, rotation, tag, onLoaded));
+                layerMasks, entityID, parentEntity, position, rotation, stitchTerrains, tag, onLoaded));
             return entityID;
         }
 
@@ -781,7 +781,15 @@ namespace FiveSQD.StraightFour.Entity
             GameObject meshGO = Instantiate(meshPrefab);
             meshGO.name = "MeshEntity-" + id.ToString();
             MeshEntity entity = meshGO.AddComponent<MeshEntity>();
-            entities.Add(id, entity);
+            if (entities.ContainsKey(id))
+            {
+                LogSystem.LogWarning("[EntityManager->LoadMeshEntity] Entity with ID " + id.ToString() + " already exists. Overwriting.");
+                entities[id] = entity;
+            }
+            else
+            {
+                entities.Add(id, entity);
+            }
             entity.SetParent(parent);
             entity.entityTag = tag;
             entity.SetPosition(position, true);
@@ -814,9 +822,9 @@ namespace FiveSQD.StraightFour.Entity
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadTerrainEntity(float length, float width, float height,
             float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks, Guid id,
-            BaseEntity parent, Vector3 position, Quaternion rotation, string tag, Action onLoaded)
+            BaseEntity parent, Vector3 position, Quaternion rotation, bool stitchTerrain, string tag, Action onLoaded)
         {
-            TerrainEntity entity = TerrainEntity.Create(length, width, height, heights, layers, layerMasks, id);
+            TerrainEntity entity = TerrainEntity.Create(length, width, height, heights, layers, layerMasks, id, stitchTerrain);
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.entityTag = tag;
@@ -849,10 +857,10 @@ namespace FiveSQD.StraightFour.Entity
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadHybridTerrainEntity(float length, float width, float height,
             float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks, Guid id,
-            BaseEntity parent, Vector3 position, Quaternion rotation, string tag, Action onLoaded)
+            BaseEntity parent, Vector3 position, Quaternion rotation, bool stitchTerrains, string tag, Action onLoaded)
         {
             HybridTerrainEntity entity = HybridTerrainEntity.Create(
-                length, width, height, heights, layers, layerMasks, id);
+                length, width, height, heights, layers, layerMasks, id, stitchTerrains);
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.entityTag = tag;

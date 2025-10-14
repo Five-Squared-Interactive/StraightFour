@@ -90,7 +90,7 @@ public class EntityManagerTests
         layerMasks.Add(1, layerMask);
         layerMasks.Add(2, layerMask);
         id = StraightFour.ActiveWorld.entityManager.LoadTerrainEntity(256, 256, 256,
-            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity);
+            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity, false);
         Assert.IsNotNull(id);
         eIDs.Add(id);
 
@@ -100,7 +100,7 @@ public class EntityManagerTests
         layerMasks.Add(1, layerMask);
         layerMasks.Add(2, layerMask);
         id = StraightFour.ActiveWorld.entityManager.LoadHybridTerrainEntity(256, 256, 256,
-            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity);
+            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity, false);
         Assert.IsNotNull(id);
         eIDs.Add(id);
 #endif
