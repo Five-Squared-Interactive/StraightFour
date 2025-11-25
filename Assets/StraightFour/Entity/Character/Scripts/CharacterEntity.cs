@@ -1052,7 +1052,11 @@ namespace FiveSQD.StraightFour.Entity
 
             if (rigidBody.useGravity)
             {
-                currentVelocity.y += -9.81f * Time.deltaTime; // TODO: Magic number, tie into larger gravity system.
+                currentVelocity.y += -9.81f * Time.fixedDeltaTime; // TODO: Magic number, tie into larger gravity system.
+            }
+            else
+            {
+                currentVelocity.y = 0;
             }
             characterController.Move(currentVelocity);
             currentVelocity.x = currentVelocity.z = 0;
