@@ -209,7 +209,9 @@ public class VoxelCoreTests
         // Test that converting index->coords->index returns the same value
         ChunkData chunk = new ChunkData(new int3(0, 0, 0), 16);
 
-        for (int testIndex = 0; testIndex < chunk.TotalVoxels; testIndex += 137)
+        // Use prime number step to test various positions without testing all 4096 voxels
+        const int testStep = 137; // Prime number ensures good coverage across the chunk
+        for (int testIndex = 0; testIndex < chunk.TotalVoxels; testIndex += testStep)
         {
             int3 coords = chunk.GetCoordinates(testIndex);
             int reconstructedIndex = chunk.GetIndex(coords.x, coords.y, coords.z);

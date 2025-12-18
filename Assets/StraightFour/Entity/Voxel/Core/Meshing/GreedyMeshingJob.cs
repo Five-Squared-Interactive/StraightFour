@@ -89,12 +89,55 @@ namespace FiveSQD.StraightFour.Entity.Voxels.Core.Meshing
             int startVertex = vertices.Length;
 
             // Define quad vertices based on normal direction
-            float3[] quadVerts = GetQuadVertices(position, normal);
-            
-            foreach (var vert in quadVerts)
+            // Get vertices directly without array allocation
+            if (normal.y == 1) // Top face
             {
-                vertices.Add(new Vector3(vert.x, vert.y, vert.z));
-                normals.Add(new Vector3(normal.x, normal.y, normal.z));
+                vertices.Add(new Vector3(position.x + 0, position.y + 1, position.z + 0));
+                vertices.Add(new Vector3(position.x + 1, position.y + 1, position.z + 0));
+                vertices.Add(new Vector3(position.x + 1, position.y + 1, position.z + 1));
+                vertices.Add(new Vector3(position.x + 0, position.y + 1, position.z + 1));
+            }
+            else if (normal.y == -1) // Bottom face
+            {
+                vertices.Add(new Vector3(position.x + 0, position.y + 0, position.z + 1));
+                vertices.Add(new Vector3(position.x + 1, position.y + 0, position.z + 1));
+                vertices.Add(new Vector3(position.x + 1, position.y + 0, position.z + 0));
+                vertices.Add(new Vector3(position.x + 0, position.y + 0, position.z + 0));
+            }
+            else if (normal.x == 1) // Right face
+            {
+                vertices.Add(new Vector3(position.x + 1, position.y + 0, position.z + 0));
+                vertices.Add(new Vector3(position.x + 1, position.y + 0, position.z + 1));
+                vertices.Add(new Vector3(position.x + 1, position.y + 1, position.z + 1));
+                vertices.Add(new Vector3(position.x + 1, position.y + 1, position.z + 0));
+            }
+            else if (normal.x == -1) // Left face
+            {
+                vertices.Add(new Vector3(position.x + 0, position.y + 0, position.z + 1));
+                vertices.Add(new Vector3(position.x + 0, position.y + 0, position.z + 0));
+                vertices.Add(new Vector3(position.x + 0, position.y + 1, position.z + 0));
+                vertices.Add(new Vector3(position.x + 0, position.y + 1, position.z + 1));
+            }
+            else if (normal.z == 1) // Front face
+            {
+                vertices.Add(new Vector3(position.x + 0, position.y + 0, position.z + 1));
+                vertices.Add(new Vector3(position.x + 1, position.y + 0, position.z + 1));
+                vertices.Add(new Vector3(position.x + 1, position.y + 1, position.z + 1));
+                vertices.Add(new Vector3(position.x + 0, position.y + 1, position.z + 1));
+            }
+            else // Back face (normal.z == -1)
+            {
+                vertices.Add(new Vector3(position.x + 1, position.y + 0, position.z + 0));
+                vertices.Add(new Vector3(position.x + 0, position.y + 0, position.z + 0));
+                vertices.Add(new Vector3(position.x + 0, position.y + 1, position.z + 0));
+                vertices.Add(new Vector3(position.x + 1, position.y + 1, position.z + 0));
+            }
+            
+            // Add normals (4 times for each vertex)
+            Vector3 normalVec = new Vector3(normal.x, normal.y, normal.z);
+            for (int i = 0; i < 4; i++)
+            {
+                normals.Add(normalVec);
             }
 
             // Add UVs (simple 0-1 mapping)
@@ -111,56 +154,6 @@ namespace FiveSQD.StraightFour.Entity.Voxels.Core.Meshing
             triangles.Add(startVertex + 0);
             triangles.Add(startVertex + 3);
             triangles.Add(startVertex + 2);
-        }
-
-        private float3[] GetQuadVertices(float3 pos, int3 normal)
-        {
-            float3[] verts = new float3[4];
-
-            if (normal.y == 1) // Top face
-            {
-                verts[0] = pos + new float3(0, 1, 0);
-                verts[1] = pos + new float3(1, 1, 0);
-                verts[2] = pos + new float3(1, 1, 1);
-                verts[3] = pos + new float3(0, 1, 1);
-            }
-            else if (normal.y == -1) // Bottom face
-            {
-                verts[0] = pos + new float3(0, 0, 1);
-                verts[1] = pos + new float3(1, 0, 1);
-                verts[2] = pos + new float3(1, 0, 0);
-                verts[3] = pos + new float3(0, 0, 0);
-            }
-            else if (normal.x == 1) // Right face
-            {
-                verts[0] = pos + new float3(1, 0, 0);
-                verts[1] = pos + new float3(1, 0, 1);
-                verts[2] = pos + new float3(1, 1, 1);
-                verts[3] = pos + new float3(1, 1, 0);
-            }
-            else if (normal.x == -1) // Left face
-            {
-                verts[0] = pos + new float3(0, 0, 1);
-                verts[1] = pos + new float3(0, 0, 0);
-                verts[2] = pos + new float3(0, 1, 0);
-                verts[3] = pos + new float3(0, 1, 1);
-            }
-            else if (normal.z == 1) // Front face
-            {
-                verts[0] = pos + new float3(0, 0, 1);
-                verts[1] = pos + new float3(1, 0, 1);
-                verts[2] = pos + new float3(1, 1, 1);
-                verts[3] = pos + new float3(0, 1, 1);
-            }
-            else // Back face (normal.z == -1)
-            {
-                verts[0] = pos + new float3(1, 0, 0);
-                verts[1] = pos + new float3(0, 0, 0);
-                verts[2] = pos + new float3(0, 1, 0);
-                verts[3] = pos + new float3(1, 1, 0);
-            }
-
-            return verts;
         }
     }
 
