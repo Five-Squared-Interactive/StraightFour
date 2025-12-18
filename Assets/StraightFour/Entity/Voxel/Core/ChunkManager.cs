@@ -270,11 +270,16 @@ namespace FiveSQD.StraightFour.Entity.Voxels.Core
             chunk.ChunkCollider = meshCollider;
         }
 
+        /// <summary>
+        /// Chunk sampling step for determining mesh type (lower = more accurate, higher = faster).
+        /// </summary>
+        private const int ChunkSamplingStep = 100;
+
         private bool ShouldUseSmoothing(ChunkData chunk)
         {
             // Sample a few voxels to determine if chunk contains smooth voxels
             // In a full implementation, this could be cached as chunk metadata
-            for (int i = 0; i < chunk.TotalVoxels; i += 100)
+            for (int i = 0; i < chunk.TotalVoxels; i += ChunkSamplingStep)
             {
                 int3 coords = chunk.GetCoordinates(i);
                 VoxelData voxel = chunk.GetVoxel(coords.x, coords.y, coords.z);

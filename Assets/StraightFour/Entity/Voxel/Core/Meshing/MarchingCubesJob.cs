@@ -76,30 +76,7 @@ namespace FiveSQD.StraightFour.Entity.Voxels.Core.Meshing
             // For now, generate a basic triangle for demonstration
             if (cubeIndex > 0 && cubeIndex < 255)
             {
-                // Simple surface approximation at cube center
-                float3 cubePos = new float3(x, y, z);
-                float3 center = cubePos + new float3(0.5f, 0.5f, 0.5f);
-                
-                // Create a simple triangle representing the surface
-                // In full implementation, this would use edge interpolation and tri table
-                int vertIndex = vertices.Length;
-                
-                vertices.Add(new Vector3(center.x, center.y, center.z));
-                vertices.Add(new Vector3(center.x + 0.5f, center.y, center.z));
-                vertices.Add(new Vector3(center.x, center.y, center.z + 0.5f));
-                
-                float3 normal = new float3(0, 1, 0);
-                normals.Add(new Vector3(normal.x, normal.y, normal.z));
-                normals.Add(new Vector3(normal.x, normal.y, normal.z));
-                normals.Add(new Vector3(normal.x, normal.y, normal.z));
-                
-                uvs.Add(new Vector2(0, 0));
-                uvs.Add(new Vector2(1, 0));
-                uvs.Add(new Vector2(0.5f, 1));
-                
-                triangles.Add(vertIndex);
-                triangles.Add(vertIndex + 1);
-                triangles.Add(vertIndex + 2);
+                GenerateSimplifiedSurfaceTriangle(x, y, z);
             }
             
             /* Full implementation would use edge vertices and triangle table:
@@ -121,6 +98,39 @@ namespace FiveSQD.StraightFour.Entity.Voxels.Core.Meshing
                 // Add vertices, normals, UVs, triangles
             }
             */
+        }
+
+        /// <summary>
+        /// Generate a simplified surface triangle for demonstration purposes.
+        /// In production, this would use full Marching Cubes tables.
+        /// </summary>
+        private void GenerateSimplifiedSurfaceTriangle(int x, int y, int z)
+        {
+            const float cubeHalfSize = 0.5f;
+            
+            // Simple surface approximation at cube center
+            float3 cubePos = new float3(x, y, z);
+            float3 center = cubePos + new float3(cubeHalfSize, cubeHalfSize, cubeHalfSize);
+            
+            // Create a simple triangle representing the surface
+            int vertIndex = vertices.Length;
+            
+            vertices.Add(new Vector3(center.x, center.y, center.z));
+            vertices.Add(new Vector3(center.x + cubeHalfSize, center.y, center.z));
+            vertices.Add(new Vector3(center.x, center.y, center.z + cubeHalfSize));
+            
+            float3 normal = new float3(0, 1, 0);
+            normals.Add(new Vector3(normal.x, normal.y, normal.z));
+            normals.Add(new Vector3(normal.x, normal.y, normal.z));
+            normals.Add(new Vector3(normal.x, normal.y, normal.z));
+            
+            uvs.Add(new Vector2(0, 0));
+            uvs.Add(new Vector2(1, 0));
+            uvs.Add(new Vector2(0.5f, 1));
+            
+            triangles.Add(vertIndex);
+            triangles.Add(vertIndex + 1);
+            triangles.Add(vertIndex + 2);
         }
 
         private int GetIndex(int x, int y, int z)

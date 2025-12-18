@@ -34,6 +34,9 @@ namespace FiveSQD.StraightFour.Entity.Voxels.Core.Meshing
 
         /// <summary>
         /// Convert to Unity Mesh.
+        /// Note: Uses ToArray() which creates temporary arrays. For production,
+        /// consider using Unity's newer mesh APIs (SetVertexBufferData, SetIndexBufferData)
+        /// that accept NativeArray directly to avoid GC allocations.
         /// </summary>
         public Mesh ToMesh()
         {
