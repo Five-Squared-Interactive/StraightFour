@@ -108,6 +108,58 @@ namespace FiveSQD.StraightFour.Environment
         }
 
         /// <summary>
+        /// Set the sky to a gradient with ground, horizon, and zenith colors.
+        /// </summary>
+        /// <param name="groundColor">Color for the ground.</param>
+        /// <param name="horizonColor">Color for the horizon.</param>
+        /// <param name="zenithColor">Color for the sky/zenith.</param>
+        /// <param name="groundHeight">Height to place ground at (-1 to 1).</param>
+        /// <param name="groundFadeAmount">Factor for fade between ground and horizon (0 to 1).</param>
+        /// <param name="horizonSkyBlend">Blending factor between horizon and sky (0.1 to 2).</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public bool SetGradientSky(Color groundColor, Color horizonColor, Color zenithColor,
+            float groundHeight = 0f, float groundFadeAmount = 0.5f, float horizonSkyBlend = 1f)
+        {
+            if (liteProceduralSkyMaterial == null)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetGradientSky] No lite procedural sky material.");
+                return false;
+            }
+
+            if (liteProceduralSkyObject == null)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetGradientSky] No lite procedural sky object.");
+                return false;
+            }
+
+            groundHeight = Mathf.Clamp(groundHeight, -1f, 1f);
+            groundFadeAmount = Mathf.Clamp01(groundFadeAmount);
+            horizonSkyBlend = Mathf.Clamp(horizonSkyBlend, 0.1f, 2f);
+
+            // Set gradient colors
+            liteProceduralSkyMaterial.SetInt("_GroundEnabled", 1);
+            liteProceduralSkyMaterial.SetColor("_GroundColor", groundColor);
+            liteProceduralSkyMaterial.SetFloat("_Ground_Height", groundHeight);
+            liteProceduralSkyMaterial.SetFloat("_Constant_Color_Mode", 1);
+            liteProceduralSkyMaterial.SetFloat("_GroundFadeAmount", groundFadeAmount);
+            liteProceduralSkyMaterial.SetFloat("_SkyColorBlend", horizonSkyBlend);
+            liteProceduralSkyMaterial.SetColor("_HorizonColorDay", horizonColor);
+            liteProceduralSkyMaterial.SetColor("_SkyColorDay", zenithColor);
+            liteProceduralSkyMaterial.SetFloat("_HorizonSaturationAmount", 0f);
+            liteProceduralSkyMaterial.SetFloat("_HorizonSaturationFalloff", 1f);
+
+            // Disable sun, moon, stars, clouds for simple gradient
+            liteProceduralSkyMaterial.SetInt("_Sun_Enabled", 0);
+            liteProceduralSkyMaterial.SetInt("_Moon_Enabled", 0);
+            liteProceduralSkyMaterial.SetInt("_Stars_Enabled", 0);
+            liteProceduralSkyMaterial.SetInt("_Clouds_Enabled", 0);
+
+            ApplyLiteProceduralSkyMaterial();
+
+            return true;
+        }
+
+        /// <summary>
         /// Set the sky to a texture.
         /// </summary>
         /// <param name="texture">Texture to set the sky to.</param>
@@ -120,6 +172,143 @@ namespace FiveSQD.StraightFour.Environment
             
             ApplySkyMaterial();
             
+            return true;
+        }
+
+        /// <summary>
+        /// Set the sky to a cubemap from 6 individual face textures.
+        /// Face order follows glTF/OMI convention: +X, -X, +Y, -Y, +Z, -Z (right-handed).
+        /// This method handles the coordinate system conversion to Unity (left-handed).
+        /// </summary>
+        /// <param name="posX">Positive X face texture (+X, right in glTF).</param>
+        /// <param name="negX">Negative X face texture (-X, left in glTF).</param>
+        /// <param name="posY">Positive Y face texture (+Y, top/up).</param>
+        /// <param name="negY">Negative Y face texture (-Y, bottom/down).</param>
+        /// <param name="posZ">Positive Z face texture (+Z, front in glTF, back in Unity).</param>
+        /// <param name="negZ">Negative Z face texture (-Z, back in glTF, front in Unity).</param>
+        /// <param name="exposure">Exposure/brightness multiplier (default 1).</param>
+        /// <param name="rotation">Rotation in degrees around up axis (default 0).</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public bool SetCubemapSky(Texture2D posX, Texture2D negX, Texture2D posY, Texture2D negY, Texture2D posZ, Texture2D negZ,
+            float exposure = 1f, float rotation = 0f)
+        {
+            if (posX == null || negX == null || posY == null || negY == null || posZ == null || negZ == null)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetCubemapSky] One or more face textures are null.");
+                return false;
+            }
+
+            // All faces must be the same size and square
+            int size = posX.width;
+            if (posX.height != size)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetCubemapSky] Cubemap face textures must be square.");
+                return false;
+            }
+
+            // Create the cubemap
+            Cubemap cubemap = new Cubemap(size, posX.format, posX.mipmapCount > 1);
+            
+            // glTF uses right-handed coordinates, Unity uses left-handed
+            // Face mapping and rotation corrections based on testing:
+            // - glTF +X -> Unity +X (rotated 180)
+            // - glTF -X -> Unity -X (rotated 180)
+            // - glTF +Y -> Unity +Y (rotated 180)
+            // - glTF -Y -> Unity -Y (rotated 180)
+            // - glTF +Z -> Unity +Z (rotated 180)
+            // - glTF -Z -> Unity -Z (rotated 180)
+            
+            CopyTextureRotated180(posX, cubemap, CubemapFace.PositiveX);
+            CopyTextureRotated180(negX, cubemap, CubemapFace.NegativeX);
+            CopyTextureRotated180(posY, cubemap, CubemapFace.PositiveY);
+            CopyTextureRotated180(negY, cubemap, CubemapFace.NegativeY);
+            CopyTextureRotated180(posZ, cubemap, CubemapFace.PositiveZ);
+            CopyTextureRotated180(negZ, cubemap, CubemapFace.NegativeZ);
+
+            // Find or create cubemap material
+            var shader = Shader.Find("Skybox/Cubemap");
+            if (shader == null)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetCubemapSky] Could not find Skybox/Cubemap shader.");
+                return false;
+            }
+
+            var cubemapMaterial = new Material(shader);
+            cubemapMaterial.SetTexture("_Tex", cubemap);
+            cubemapMaterial.SetFloat("_Exposure", exposure);
+            cubemapMaterial.SetFloat("_Rotation", rotation);
+
+            RenderSettings.skybox = cubemapMaterial;
+            liteProceduralSkyObject?.SetActive(false);
+            
+            DynamicGI.UpdateEnvironment();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Copy a texture to a cubemap face with 180 degree rotation using GPU blit.
+        /// </summary>
+        private void CopyTextureRotated180(Texture2D source, Cubemap cubemap, CubemapFace face)
+        {
+            int size = source.width;
+            
+            // Create a temporary RenderTexture
+            RenderTexture rt = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGB32);
+            rt.filterMode = FilterMode.Bilinear;
+            
+            // Blit with scale (-1, -1) to rotate 180 degrees
+            Graphics.Blit(source, rt, new Vector2(-1, -1), new Vector2(1, 1));
+            
+            // Read back from RenderTexture to a temporary texture, then copy to cubemap
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = rt;
+            Texture2D tempTex = new Texture2D(size, size, TextureFormat.ARGB32, false);
+            tempTex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
+            tempTex.Apply();
+            RenderTexture.active = previous;
+            
+            // Copy mip 0 to mip 0 of the cubemap face
+            Graphics.CopyTexture(tempTex, 0, 0, cubemap, (int)face, 0);
+            
+            // Cleanup
+            Object.Destroy(tempTex);
+            RenderTexture.ReleaseTemporary(rt);
+        }
+
+        /// <summary>
+        /// Set the sky to an equirectangular panorama texture.
+        /// </summary>
+        /// <param name="panoramaTexture">The equirectangular panorama texture.</param>
+        /// <param name="exposure">Exposure/brightness multiplier (default 1).</param>
+        /// <param name="rotation">Rotation in degrees around up axis (default 0).</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public bool SetPanoramaSky(Texture2D panoramaTexture, float exposure = 1f, float rotation = 0f)
+        {
+            if (panoramaTexture == null)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetPanoramaSky] Panorama texture is null.");
+                return false;
+            }
+
+            var shader = Shader.Find("Skybox/Panoramic");
+            if (shader == null)
+            {
+                LogSystem.LogError("[EnvironmentManager->SetPanoramaSky] Could not find Skybox/Panoramic shader.");
+                return false;
+            }
+
+            var panoramaMaterial = new Material(shader);
+            panoramaMaterial.SetTexture("_MainTex", panoramaTexture);
+            panoramaMaterial.SetFloat("_Exposure", exposure);
+            panoramaMaterial.SetFloat("_Rotation", rotation);
+            panoramaMaterial.SetInt("_Mapping", 1); // Latitude Longitude Layout
+
+            RenderSettings.skybox = panoramaMaterial;
+            liteProceduralSkyObject?.SetActive(false);
+            
+            DynamicGI.UpdateEnvironment();
+
             return true;
         }
 
