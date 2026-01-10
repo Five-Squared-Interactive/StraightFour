@@ -1,0 +1,464 @@
+{
+  "metadata": {
+    "analysis_date": "2024-12-19",
+    "straightfour_version": "current",
+    "total_extensions_analyzed": 34,
+    "support_summary": {
+      "full_support": 8,
+      "partial_support": 16,
+      "no_support": 10
+    }
+  },
+  "extensions": {
+    "KHR_lights_punctual": {
+      "support_level": "full",
+      "mapped_entities": ["LightEntity"],
+      "supported_features": [
+        "directional_lights",
+        "point_lights",
+        "spot_lights",
+        "color_properties",
+        "intensity_control",
+        "range_settings"
+      ],
+      "missing_features": [],
+      "implementation_notes": "Complete Unity Light component integration"
+    },
+    "KHR_materials_unlit": {
+      "support_level": "full",
+      "mapped_entities": ["MeshEntity"],
+      "supported_features": [
+        "unlit_shader",
+        "base_color_texture",
+        "alpha_mode"
+      ],
+      "missing_features": [],
+      "implementation_notes": "URP unlit shader support"
+    },
+    "KHR_mesh_quantization": {
+      "support_level": "partial",
+      "mapped_entities": ["MeshEntity"],
+      "supported_features": [
+        "automatic_compression",
+        "unity_optimization"
+      ],
+      "missing_features": [
+        "custom_quantization_bits",
+        "runtime_compression_control",
+        "selective_attribute_quantization"
+      ],
+      "implementation_notes": "Relies on Unity's internal mesh compression"
+    },
+    "OMI_audio_emitter": {
+      "support_level": "full",
+      "mapped_entities": ["AudioEntity"],
+      "supported_features": [
+        "3d_positioning",
+        "volume_control",
+        "pitch_control",
+        "looping",
+        "audio_clips",
+        "basic_spatialization"
+      ],
+      "missing_features": [],
+      "implementation_notes": "Complete Unity AudioSource wrapper"
+    },
+    "OMI_spatial_audio": {
+      "support_level": "partial",
+      "mapped_entities": ["AudioEntity"],
+      "supported_features": [
+        "3d_positioning",
+        "distance_attenuation",
+        "doppler_effect"
+      ],
+      "missing_features": [
+        "hrtf_processing",
+        "room_acoustics",
+        "reverb_zones",
+        "advanced_spatial_effects",
+        "binaural_audio"
+      ],
+      "implementation_notes": "Limited by Unity's built-in audio spatialization"
+    },
+    "OMI_ui_canvas": {
+      "support_level": "full",
+      "mapped_entities": ["UIEntity"],
+      "supported_features": [
+        "screen_space_overlay",
+        "screen_space_camera",
+        "world_space",
+        "scaling_modes",
+        "sorting_layers"
+      ],
+      "missing_features": [],
+      "implementation_notes": "Complete Unity Canvas system"
+    },
+    "OMI_ui_button": {
+      "support_level": "full",
+      "mapped_entities": ["UIEntity"],
+      "supported_features": [
+        "click_events",
+        "hover_states",
+        "press_states",
+        "visual_transitions",
+        "navigation"
+      ],
+      "missing_features": [],
+      "implementation_notes": "Unity Button component with full interaction support"
+    },
+    "OMI_ui_text": {
+      "support_level": "full",
+      "mapped_entities": ["UIEntity"],
+      "supported_features": [
+        "text_rendering",
+        "font_support",
+        "styling",
+        "alignment",
+        "wrapping",
+        "overflow_handling"
+      ],
+      "missing_features": [],
+      "implementation_notes": "TextMeshPro integration"
+    },
+    "OMI_ui_input": {
+      "support_level": "full",
+      "mapped_entities": ["UIEntity"],
+      "supported_features": [
+        "text_input",
+        "placeholder_text",
+        "validation",
+        "keyboard_events",
+        "focus_management"
+      ],
+      "missing_features": [],
+      "implementation_notes": "Unity InputField component"
+    },
+    "OMI_physics_body": {
+      "support_level": "partial",
+      "mapped_entities": ["BaseEntity"],
+      "supported_features": [
+        "basic_rigidbody",
+        "mass_property",
+        "unity_colliders"
+      ],
+      "missing_features": [
+        "collision_shape_definition",
+        "physics_materials",
+        "advanced_body_properties",
+        "constraint_systems",
+        "compound_shapes",
+        "convex_decomposition"
+      ],
+      "implementation_notes": "Basic Unity Rigidbody support only"
+    },
+    "OMI_physics_joint": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "hinge_joints",
+        "spring_joints",
+        "fixed_joints",
+        "joint_limits",
+        "joint_drives",
+        "breakable_joints"
+      ],
+      "implementation_notes": "No joint system implemented"
+    },
+    "OMI_vehicle_thruster": {
+      "support_level": "partial",
+      "mapped_entities": ["AirplaneEntity"],
+      "supported_features": [
+        "basic_thrust_application",
+        "thrust_direction"
+      ],
+      "missing_features": [
+        "fuel_consumption",
+        "engine_curves",
+        "thrust_vectoring",
+        "engine_failure_states",
+        "efficiency_modeling"
+      ],
+      "implementation_notes": "Simple thrust vector implementation"
+    },
+    "OMI_vehicle_wheel": {
+      "support_level": "partial",
+      "mapped_entities": ["AutomobileEntity"],
+      "supported_features": [
+        "wheel_colliders",
+        "basic_suspension",
+        "steering_input"
+      ],
+      "missing_features": [
+        "tire_physics_models",
+        "suspension_tuning",
+        "brake_fade",
+        "tire_wear",
+        "grip_modeling",
+        "differential_systems"
+      ],
+      "implementation_notes": "Unity WheelCollider integration"
+    },
+    "OMI_vehicle_engine": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "engine_simulation",
+        "torque_curves",
+        "fuel_consumption",
+        "engine_sounds",
+        "transmission_systems",
+        "engine_failure"
+      ],
+      "implementation_notes": "No engine physics simulation"
+    },
+    "OMI_terrain_heightmap": {
+      "support_level": "partial",
+      "mapped_entities": ["TerrainEntity"],
+      "supported_features": [
+        "static_heightmaps",
+        "basic_rendering"
+      ],
+      "missing_features": [
+        "procedural_generation",
+        "level_of_detail",
+        "streaming",
+        "dynamic_modification",
+        "multi_resolution"
+      ],
+      "implementation_notes": "Unity Terrain component for static heightmaps"
+    },
+    "OMI_voxel_grid": {
+      "support_level": "partial",
+      "mapped_entities": ["VoxelEntity"],
+      "supported_features": [
+        "basic_voxel_grids",
+        "voxel_rendering"
+      ],
+      "missing_features": [
+        "sparse_voxel_octrees",
+        "compression",
+        "level_of_detail",
+        "streaming",
+        "procedural_generation"
+      ],
+      "implementation_notes": "Basic voxel grid implementation"
+    },
+    "OMI_placement_socket": {
+      "support_level": "partial",
+      "mapped_entities": ["PlacementSocket"],
+      "supported_features": [
+        "socket_positioning",
+        "basic_constraints"
+      ],
+      "missing_features": [
+        "snap_points",
+        "alignment_constraints",
+        "validation_rules",
+        "preview_system"
+      ],
+      "implementation_notes": "Basic socket implementation exists"
+    },
+    "OMI_interactable": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "hover_detection",
+        "interaction_types",
+        "state_management",
+        "event_system",
+        "interaction_feedback"
+      ],
+      "implementation_notes": "No interaction system implemented"
+    },
+    "OMI_grabbable": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "grab_constraints",
+        "hand_poses",
+        "manipulation_physics",
+        "grab_events",
+        "release_behavior"
+      ],
+      "implementation_notes": "No grab system for VR/AR"
+    },
+    "OMI_network_transform": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "transform_synchronization",
+        "interpolation",
+        "compression",
+        "authority_management",
+        "lag_compensation"
+      ],
+      "implementation_notes": "No networking system implemented"
+    },
+    "OMI_network_avatar": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "avatar_synchronization",
+        "animation_sync",
+        "voice_chat",
+        "presence_system",
+        "avatar_customization"
+      ],
+      "implementation_notes": "No networked avatar system"
+    },
+    "OMI_animation_pointer": {
+      "support_level": "none",
+      "mapped_entities": [],
+      "supported_features": [],
+      "missing_features": [
+        "property_targeting",
+        "animation_paths",
+        "custom_properties",
+        "interpolation_control"
+      ],
+      "implementation_notes": "No property animation targeting system"
+    },
+    "OMI_spawn_point": {
+      "support_level": "partial",
+      "mapped_entities": ["BaseEntity"],
+      "supported_features": [
+        "position_spawning",
+        "basic_orientation"
+      ],
+      "missing_features": [
+        "spawn_constraints",
+        "respawn_logic",
+        "spawn_validation",
+        "spawn_effects"
+      ],
+      "implementation_notes": "Basic transform positioning only"
+    }
+  },
+  "entities": {
+    "BaseEntity": {
+      "supported_extensions": [
+        "OMI_physics_body",
+        "OMI_spawn_point"
+      ],
+      "partially_supported_extensions": [
+        "OMI_physics_body",
+        "OMI_spawn_point"
+      ],
+      "missing_critical_extensions": [
+        "OMI_interactable",
+        "OMI_grabbable",
+        "OMI_network_transform"
+      ]
+    },
+    "LightEntity": {
+      "supported_extensions": [
+        "KHR_lights_punctual"
+      ],
+      "partially_supported_extensions": [],
+      "missing_extensions": [
+        "OMI_light_area",
+        "OMI_light_probe"
+      ]
+    },
+    "MeshEntity": {
+      "supported_extensions": [
+        "KHR_materials_unlit"
+      ],
+      "partially_supported_extensions": [
+        "KHR_mesh_quantization",
+        "OMI_physics_shape"
+      ],
+      "missing_extensions": [
+        "OMI_materials_portal",
+        "KHR_materials_pbrSpecularGlossiness"
+      ]
+    },
+    "AudioEntity": {
+      "supported_extensions": [
+        "OMI_audio_emitter"
+      ],
+      "partially_supported_extensions": [
+        "OMI_spatial_audio"
+      ],
+      "missing_extensions": []
+    },
+    "UIEntity": {
+      "supported_extensions": [
+        "OMI_ui_canvas",
+        "OMI_ui_button",
+        "OMI_ui_text",
+        "OMI_ui_input"
+      ],
+      "partially_supported_extensions": [],
+      "missing_extensions": []
+    },
+    "AirplaneEntity": {
+      "supported_extensions": [],
+      "partially_supported_extensions": [
+        "OMI_vehicle_thruster"
+      ],
+      "missing_extensions": [
+        "OMI_vehicle_engine"
+      ]
+    },
+    "AutomobileEntity": {
+      "supported_extensions": [],
+      "partially_supported_extensions": [
+        "OMI_vehicle_wheel"
+      ],
+      "missing_extensions": [
+        "OMI_vehicle_engine"
+      ]
+    },
+    "TerrainEntity": {
+      "supported_extensions": [],
+      "partially_supported_extensions": [
+        "OMI_terrain_heightmap"
+      ],
+      "missing_extensions": [
+        "OMI_terrain_material"
+      ]
+    },
+    "VoxelEntity": {
+      "supported_extensions": [],
+      "partially_supported_extensions": [
+        "OMI_voxel_grid"
+      ],
+      "missing_extensions": [
+        "OMI_voxel_material"
+      ]
+    },
+    "PlacementSocket": {
+      "supported_extensions": [],
+      "partially_supported_extensions": [
+        "OMI_placement_socket"
+      ],
+      "missing_extensions": [
+        "OMI_placement_grid"
+      ]
+    }
+  },
+  "recommendations": {
+    "immediate_priority": [
+      "OMI_interactable",
+      "OMI_physics_body",
+      "OMI_animation_pointer"
+    ],
+    "short_term_priority": [
+      "OMI_network_transform",
+      "OMI_grabbable",
+      "OMI_vehicle_engine"
+    ],
+    "long_term_priority": [
+      "OMI_materials_portal",
+      "OMI_spatial_anchor",
+      "OMI_terrain_heightmap"
+    ]
+  }
+}
