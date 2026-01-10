@@ -1,0 +1,24 @@
+name: AI Task Dispatch
+
+on:
+  push:
+    paths:
+      - "ai-tasks/**"
+
+jobs:
+  notify-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract task info
+        id: task
+        run: |
+          echo "repo=${GITHUB_REPOSITORY}" >> $GITHUB_OUTPUT
+          echo "commit=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          echo "task_file=$(git diff --name-only HEAD~1 HEAD | grep ai-tasks/)" >> $GITHUB_OUTPUT
+
+      - name: Send task to AI worker
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"repo\": \"${{ steps.task.outputs.repo }}\", \"task_file\": \"${{ steps.task.outputs.task_file }}\", \"type\": \"task\"}" \
+            ${{ secrets.AI_WORKER_WEBHOOK_URL }}

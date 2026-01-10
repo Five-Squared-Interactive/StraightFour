@@ -1,0 +1,16 @@
+name: Nightly Maintenance
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  dispatch-nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send nightly task to worker
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"repo\": \"${{ github.repository }}\", \"type\": \"nightly\"}" \
+            ${{ secrets.AI_WORKER_WEBHOOK_URL }}

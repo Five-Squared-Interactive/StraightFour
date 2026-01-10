@@ -1,0 +1,19 @@
+name: AI Review Fix
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  dispatch-review-fix:
+    runs-on: ubuntu-latest
+    if: contains(github.event.comment.body, '@ai-fix')
+    steps:
+      - name: Send review fix request
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"repo\": \"${{ github.repository }}\", \"pr\": \"${{ github.event.pull_request.number }}\", \"comment\": \"${{ github.event.comment.body }}\", \"type\": \"review_fix\"}" \
+            ${{ secrets.AI_WORKER_WEBHOOK_URL }}
