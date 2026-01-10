@@ -1,0 +1,7 @@
+requests>=2.28.0
+gitpython>=3.1.30
+pyyaml>=6.0
+pathlib
+argparse
+logging
+json-schema>=4.17.0

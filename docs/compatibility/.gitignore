@@ -1,0 +1,11 @@
+# Temporary files during analysis
+temp/
+*.tmp
+*.log
+
+# Downloaded repositories (if any)
+omi-gltf-extensions/
+
+# Cache files
+*.cache
+__pycache__/
